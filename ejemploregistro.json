@@ -1,0 +1,59 @@
+
+{
+    "_comment": "ejemplo de registro, en postman, Body-raw-JSON",
+
+    "id": 0,
+    "Sistema": "MyFinances",
+    "Descripcion": "Sistema para registro de ingresos y egresos",
+    "Logo": "D:/Trabajos/Proyectos/MyFinances/Movile/MyFinancesMovile/assets/ahorro6.png",
+    "detalle_backend": [
+        {
+            "Repositorio": "https://github.com/RafaIbarra/MyFinancesBackend",
+            "Framework": "Django Rest Framework",
+            "Lenguaje": "Python",
+            "BaseDatos":"Postgresql",
+            "Alojamiento":"Servidor Propio",
+            "SO":"Ubuntu",
+            "Urls":"https://api.rafaelibarra.xyz/",
+            "ServidorWeb":"Nginx"
+
+        }
+    ],
+    "detalle_frontend": [
+        {
+            "Repositorio": "https://github.com/RafaIbarra/MyFinancesWeb",
+            "Framework": "React",
+            "Lenguaje": "Javascript",
+            "Alojamiento":"Vercel",
+            "SO":"",
+            "Urls":"https://my-finances-web-git-main-rafaels-projects-2fb6f3d4.vercel.app/",
+            "ServidorWeb":""
+
+        }
+    ],
+    
+    "detalle_movil": [
+        {
+            "Repositorio": "https://github.com/RafaIbarra/MyFinancesMovile",
+            "Framework": "React-Native-Expo",
+            "Lenguaje": "Javascript",
+            "VersionAndroid":"SI",
+            "VersioniOS":"NO",
+            "EnlaceDescarga":"https://drive.google.com/file/d/1kYxjhmOZCCruOxXhUU3nCQfEH5fX1oBR/view?usp=sharing"
+
+        }
+    ],
+    
+    
+    "detalle_tags": [
+        {
+            "Tag": "DRF"
+        },
+        {
+            "Tag": "Expo"
+        },
+        {
+            "Tag": "React"
+        }
+    ]
+}
