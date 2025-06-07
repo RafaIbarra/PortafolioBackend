@@ -6,9 +6,21 @@ import schemas
 from datetime import datetime
 from database import SessionLocal, engine
 from models import Proyectos, DetalleBackend, DetalleFrontend, DetalleMovil, ProyectosTags
+from fastapi.middleware.cors import CORSMiddleware
 # Crear la aplicación FastAPI
 app = FastAPI()
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173"
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Dependency para obtener sesión de DB
 def get_db():
     db = SessionLocal()
@@ -22,7 +34,7 @@ def get_db():
 @app.post("/RegistrarProyecto/", response_model=schemas.Proyectos, status_code=status.HTTP_201_CREATED)
 def RegistrarProyecto(data: schemas.ProyectoConDetallesCreate, db: Session = Depends(get_db)):
     # 1. Crear o actualizar el proyecto principal
-    print(data)
+    
     if not data.id or data.id == 0:
         db_proyecto = Proyectos(
             Sistema=data.Sistema,
