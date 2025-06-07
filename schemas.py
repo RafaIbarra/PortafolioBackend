@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,field_serializer
 from typing import List, Optional
 from datetime import datetime
 
@@ -113,3 +113,9 @@ class Proyectos(BaseModel):
 
     class Config:
         from_attributes = True
+
+    @field_serializer("fecha_registro")
+    def serialize_fecha_registro(self, fecha: Optional[datetime]) -> Optional[str]:
+        if fecha:
+            return fecha.strftime("%d/%m/%Y %H:%M:%S")
+        return None
