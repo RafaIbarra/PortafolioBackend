@@ -3,6 +3,13 @@ from database import Base
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
+
+class SesionActiva(Base):
+    __tablename__ = "SesionActiva"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    DataSesion = Column(String(150), index=True)
+
 class Proyectos(Base):
     __tablename__ = "Proyectos"
     
