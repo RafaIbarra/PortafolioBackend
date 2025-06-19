@@ -5,7 +5,7 @@ import models
 import schemas
 from datetime import datetime
 from database import SessionLocal, engine
-from models import Proyectos, DetalleBackend, DetalleFrontend, DetalleMovil, ProyectosTags
+from models import Proyectos, DetalleBackend, DetalleFrontend, DetalleMovil, ProyectosTags,SesionActiva
 from fastapi.middleware.cors import CORSMiddleware
 import os, uuid, json
 from datetime import datetime
@@ -15,6 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import Request
 from starlette.datastructures import UploadFile as StarletteUploadFile
 from dotenv import load_dotenv
+import random
+import string
 # Crear la aplicación FastAPI
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
@@ -52,6 +54,34 @@ async def verify_api_key(api_key: str = Header(..., alias="X-API-Key")):
         )
 app.dependency_overrides[verify_api_key] = verify_api_key
 
+def generar_token(longitud: int = 20):
+    caracteres = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(random.choices(caracteres, k=longitud))
+
+
+@app.post("/InicioSesion/", response_model=schemas.SesionActiva, status_code=status.HTTP_200_OK)
+async def InicioSesion(contra: str = Form(...), db: Session = Depends(get_db)):
+    if contra.lower() != PSW.lower():
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Contraseña incorrecta"
+        )
+
+    token = generar_token()
+
+    # Verificar si ya hay una sesión activa
+    sesion = db.query(SesionActiva).first()
+    if sesion:
+        sesion.DataSesion = token
+    else:
+        sesion = SesionActiva(DataSesion=token)
+        db.add(sesion)
+
+    db.commit()
+    db.refresh(sesion)
+    return sesion
+
+    
 @app.post("/RegistrarProyecto/", response_model=schemas.Proyectos, status_code=status.HTTP_201_CREATED)
 async def RegistrarProyecto(
     Sistema: str = Form(...),

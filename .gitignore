@@ -4,3 +4,4 @@ __pycache__
 script.py.mako
 alembic.ini
 portafolio_app.tar
+.env
