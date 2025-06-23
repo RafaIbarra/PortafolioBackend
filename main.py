@@ -76,6 +76,18 @@ def generar_token(longitud: int = 20):
     caracteres = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choices(caracteres, k=longitud))
 
+@app.get("/VerificarSesion/", status_code=200)
+def verificar_sesion(
+    request: Request,
+    db: Session = Depends(get_db),
+    _: str = Depends(verify_api_session)  # Verifica el header X-API-Session
+):
+    """
+    Endpoint para verificar si la sesión es válida.
+    Devuelve True si la sesión es válida (status 200 OK).
+    Si no es válida, verify_api_session lanzará automáticamente 401.
+    """
+    return True
 
 @app.post("/InicioSesion/", response_model=schemas.SesionActiva, status_code=status.HTTP_200_OK)
 async def InicioSesion(password: str = Form(...) , db: Session = Depends(get_db)):
