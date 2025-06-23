@@ -54,14 +54,32 @@ async def verify_api_key(api_key: str = Header(..., alias="X-API-Key")):
         )
 app.dependency_overrides[verify_api_key] = verify_api_key
 
+async def verify_api_session(x_api_session: str = Header(..., alias="X-API-Session"),
+    db: Session = Depends(get_db)
+):
+    # Busca la sesión activa en la base de datos
+    sesion_activa = db.query(SesionActiva).first()
+    
+    # Si no hay sesión activa o no coincide con la del header
+    if not sesion_activa or sesion_activa.DataSesion != x_api_session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sesión no válida o expirada"
+        )
+    
+    return x_api_session
+
+# Opcional: Sobrescribir la dependencia si es necesario
+app.dependency_overrides[verify_api_session] = verify_api_session
+
 def generar_token(longitud: int = 20):
     caracteres = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choices(caracteres, k=longitud))
 
 
 @app.post("/InicioSesion/", response_model=schemas.SesionActiva, status_code=status.HTTP_200_OK)
-async def InicioSesion(contra: str = Form(...), db: Session = Depends(get_db)):
-    if contra.lower() != PSW.lower():
+async def InicioSesion(password: str = Form(...) , db: Session = Depends(get_db)):
+    if password.lower() != PSW.lower():
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Contraseña incorrecta"
@@ -93,22 +111,22 @@ async def RegistrarProyecto(
     detalle_tags: str = Form(None),
     Logo: Union[UploadFile, str, None] = File(None),
     db: Session = Depends(get_db),
-    _: str = Depends(verify_api_key)
+    _: str = Depends(verify_api_session)
 ):
     import os, uuid, json
     from datetime import datetime
     import shutil
     
-    print("===== DATOS RECIBIDOS =====")
-    print(f"Sistema: {Sistema}")
-    print(f"Descripcion: {Descripcion}")
-    print(f"id: {id}")
-    print(f"detalle_backend: {detalle_backend}")
-    print(f"detalle_frontend: {detalle_frontend}")
-    print(f"detalle_movil: {detalle_movil}")
-    print(f"detalle_tags: {detalle_tags}")
-    print(f"Logo: {type(Logo)} -> {getattr(Logo, 'filename', Logo)}")
-    print("============================")
+    # print("===== DATOS RECIBIDOS =====")
+    # print(f"Sistema: {Sistema}")
+    # print(f"Descripcion: {Descripcion}")
+    # print(f"id: {id}")
+    # print(f"detalle_backend: {detalle_backend}")
+    # print(f"detalle_frontend: {detalle_frontend}")
+    # print(f"detalle_movil: {detalle_movil}")
+    # print(f"detalle_tags: {detalle_tags}")
+    # print(f"Logo: {type(Logo)} -> {getattr(Logo, 'filename', Logo)}")
+    # print("============================")
 
 
     # Guardar archivo si viene
@@ -159,14 +177,13 @@ async def RegistrarProyecto(
 
     # Eliminar datos anteriores si es edición
     if id and id != 0:
-        print('entro')
+        
         db.query(DetalleBackend).filter_by(proyecto_id=db_proyecto.id).delete()
         db.query(DetalleFrontend).filter_by(proyecto_id=db_proyecto.id).delete()
         db.query(DetalleMovil).filter_by(proyecto_id=db_proyecto.id).delete()
         db.query(ProyectosTags).filter_by(proyecto_id=db_proyecto.id).delete()
         db.commit()
-    else:
-        print('NO entro')
+  
     # Insertar nuevos detalles
     # if detalle_backend:
     #     db.bulk_save_objects([
@@ -207,7 +224,7 @@ async def RegistrarProyecto(
 
 
 @app.delete("/EliminarProyecto/{proyecto_id}", status_code=status.HTTP_200_OK)
-def EliminarProyecto(proyecto_id: int, db: Session = Depends(get_db)):
+def EliminarProyecto(proyecto_id: int, db: Session = Depends(get_db), _: str = Depends(verify_api_session)):
     proyecto = db.query(models.Proyectos).get(proyecto_id)
     
     if not proyecto:
