@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field,field_serializer
-from typing import List, Optional
+from typing import List, Optional,Dict
 from datetime import datetime
 
 # Schemas para crear detalles (usados en el endpoint POST)
@@ -123,5 +123,26 @@ class Proyectos(BaseModel):
 class SesionActiva(BaseModel):
     id: int
     DataSesion: str
+
+class RepositoriosFrameworks(BaseModel):
+    id : int
+    Framework : str
+    NombreRepositorio : str
+    Url : str
+    Tipo : str
+    fecha_registro : Optional[datetime] = None
+
+class RepositoryInfo(BaseModel):
+    name: str
+    url: str
+    type: str
+
+class FrameworkSummary(BaseModel):
+    count: int
+    repositories: List[RepositoryInfo]
+
+class ListarFrameworksResponse(BaseModel):
+    detalles: List[RepositoriosFrameworks]
+    resumen: Dict[str, FrameworkSummary]
 
     

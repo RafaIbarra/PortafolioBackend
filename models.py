@@ -10,6 +10,16 @@ class SesionActiva(Base):
     id = Column(Integer, primary_key=True, index=True)
     DataSesion = Column(String(150), index=True)
 
+class RepositoriosFrameworks(Base):
+    __tablename__ = "RepositoriosFrameworks"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    Framework = Column(String(150), index=True)
+    NombreRepositorio = Column(String(200), nullable=False)
+    Url = Column(String(200), nullable=True)
+    Tipo = Column(String(200), nullable=True)
+    fecha_registro = Column(DateTime, default=datetime.utcnow)
+
 class Proyectos(Base):
     __tablename__ = "Proyectos"
     

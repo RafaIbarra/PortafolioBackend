@@ -1,11 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException, status,Header
 from sqlalchemy.orm import Session
-from typing import List,Optional,Union
+from typing import List,Union,Dict,  Set, Any
+import requests
+import re
+import base64
 import models
 import schemas
 from datetime import datetime
 from database import SessionLocal, engine
-from models import Proyectos, DetalleBackend, DetalleFrontend, DetalleMovil, ProyectosTags,SesionActiva
+from models import Proyectos, DetalleBackend, DetalleFrontend, DetalleMovil, ProyectosTags,SesionActiva,RepositoriosFrameworks
+from schemas import ListarFrameworksResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os, uuid, json
 from datetime import datetime
@@ -15,8 +19,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import Request
 from starlette.datastructures import UploadFile as StarletteUploadFile
 from dotenv import load_dotenv
+from data_repositorio import fetch_auto_detected_frameworks
 import random
 import string
+from sqlalchemy import delete
+from collections import defaultdict
 # Crear la aplicación FastAPI
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
@@ -78,6 +85,93 @@ app.dependency_overrides[verify_api_session] = verify_api_session
 def generar_token(longitud: int = 20):
     caracteres = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choices(caracteres, k=longitud))
+
+@app.get("/RegistrarEstadisticasRepositorio/", status_code=200)
+def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get_db)):
+    try:
+        # Obtener los frameworks detectados
+        framework_details = fetch_auto_detected_frameworks()
+        print('Los frameworks son:', framework_details)
+        
+        # Si hay datos, proceder con el guardado
+        if framework_details:
+            # 1. Eliminar todos los registros existentes
+            db.execute(delete(RepositoriosFrameworks))
+            db.commit()
+            fecha_hoy=datetime.utcnow()
+            # 2. Insertar los nuevos registros
+            for framework_name, data in framework_details.items():
+                for repo in data['repositories']:
+                    nuevo_registro = RepositoriosFrameworks(
+                        Framework=framework_name,
+                        NombreRepositorio=repo['name'],
+                        Url=repo['url'],
+                        Tipo=repo['type'],
+                        fecha_registro=fecha_hoy
+                    )
+                    db.add(nuevo_registro)
+            
+            db.commit()
+            
+            return {
+                "status": "success",
+                "message": "Datos actualizados correctamente",
+                "frameworks_registrados": len(framework_details),
+                "repositorios_registrados": sum(len(data['repositories']) for data in framework_details.values())
+            }
+        else:
+            return {
+                "status": "info",
+                "message": "No se encontraron frameworks para registrar"
+            }
+
+    except Exception as error:
+        db.rollback()
+        print("Error general:", error)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(error)
+        )
+
+@app.get("/ListarFrameworks/", response_model=ListarFrameworksResponse)
+def ListarFrameworks(db: Session = Depends(get_db)):
+    # Obtener todos los registros de la base de datos
+    db_frameworks = db.query(models.RepositoriosFrameworks).all()
+    
+    # Convertir a lista de schemas.RepositoriosFrameworks
+    frameworks = [
+        schemas.RepositoriosFrameworks(
+            id=item.id,
+            Framework=item.Framework,
+            NombreRepositorio=item.NombreRepositorio,
+            Url=item.Url,
+            Tipo=item.Tipo,
+            fecha_registro=item.fecha_registro
+        ) for item in db_frameworks
+    ]
+    
+    # Procesar para crear el resumen
+    data_resumen = defaultdict(lambda: {"count": 0, "repositories": []})
+    
+    for repo in db_frameworks:
+        framework_name = repo.Framework
+        data_resumen[framework_name]["count"] += 1
+        data_resumen[framework_name]["repositories"].append({
+            "name": repo.NombreRepositorio,
+            "url": repo.Url,
+            "type": repo.Tipo
+        })
+    
+    # Convertir defaultdict a dict normal
+    data_resumen_dict = {
+        k: schemas.FrameworkSummary(**v) 
+        for k, v in data_resumen.items()
+    }
+    
+    return {
+        'detalles': frameworks,
+        'resumen': data_resumen_dict
+    }
 
 @app.get("/VerificarSesion/", status_code=200)
 def verificar_sesion(
