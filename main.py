@@ -28,7 +28,10 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)  # Crea la carpeta si no existe
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    "https://portafolio-web-admin-yu42.vercel.app",
+    "https://portafolio-web-admin.vercel.app",
+    "https://pradmin.rafaelibarra.xyz"  # ¡Añade este dominio!
 ]
 
 app.add_middleware(
