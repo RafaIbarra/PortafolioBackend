@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Text,DECIMAL
 from database import Base
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -18,6 +18,14 @@ class RepositoriosFrameworks(Base):
     NombreRepositorio = Column(String(200), nullable=False)
     Url = Column(String(200), nullable=True)
     Tipo = Column(String(200), nullable=True)
+    fecha_registro = Column(DateTime, default=datetime.utcnow)
+
+class RepositorioLenguajes(Base):
+    __tablename__ = "RepositorioLenguajes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    Lenguaje = Column(String(150), index=True)
+    Valor = Column(DECIMAL(2), nullable=False)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
 
 class Proyectos(Base):

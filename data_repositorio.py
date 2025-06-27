@@ -3,6 +3,7 @@ import requests
 import re
 import base64
 import os
+from collections import defaultdict
 def fetch_auto_detected_frameworks():
     try:
         # 1. Obtener repositorios del usuario
@@ -228,3 +229,54 @@ def fetch_auto_detected_frameworks():
     except Exception as error:
         print("Error general:", error)
         raise error
+
+def fetch_lenguajes():
+    try:
+        # 1. Obtener repositorios del usuario
+        headers = {
+            "Authorization": f"token {os.getenv('VITE_GITHUB_TOKEN')}"
+        }
+        repos_response = requests.get(os.getenv('VITE_GITHUB_API_URL'), headers=headers)
+        
+        if not repos_response.ok:
+            raise Exception("Error al obtener repositorios")
+        
+        repos = repos_response.json()
+
+        # 2. Objeto para almacenar total de bytes por lenguaje
+        language_totals = defaultdict(int)
+
+        # 3. Procesar cada repositorio para obtener lenguajes
+        for repo in repos:
+            try:
+                languages_response = requests.get(repo['languages_url'], headers=headers)
+                if languages_response.ok:
+                    repo_languages = languages_response.json()
+                    
+                    # Sumar los bytes por lenguaje
+                    for language, bytes_used in repo_languages.items():
+                        language_totals[language] += bytes_used
+
+            except Exception as e:
+                print(f"Error obteniendo lenguajes para {repo['name']}: {e}")
+                continue
+
+        # 4. Calcular total de bytes
+        total_bytes = sum(language_totals.values())
+
+        # 5. Calcular porcentajes
+        percentages = {}
+        if total_bytes > 0:  # Evitar división por cero
+            for language, bytes_used in language_totals.items():
+                percentages[language] = f"{(bytes_used / total_bytes * 100):.2f}%"
+
+        # 6. Imprimir resultados
+        print("Distribución de lenguajes:")
+        for lang, percent in percentages.items():
+            print(f"{lang}: {percent}")
+
+        return percentages
+
+    except Exception as error:
+        print("Error general:", error)
+        return {}
