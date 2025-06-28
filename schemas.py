@@ -131,6 +131,11 @@ class RepositoriosFrameworks(BaseModel):
     Url : str
     Tipo : str
     fecha_registro : Optional[datetime] = None
+    @field_serializer("fecha_registro")
+    def serialize_fecha_registro(self, fecha: Optional[datetime]) -> Optional[str]:
+        if fecha:
+            return fecha.strftime("%d/%m/%Y %H:%M:%S")
+        return None
 
 class RepositoryInfo(BaseModel):
     name: str
@@ -141,8 +146,13 @@ class FrameworkSummary(BaseModel):
     count: int
     repositories: List[RepositoryInfo]
 
+class LenguajeInfo(BaseModel):
+    lenguaje: str
+    valor: float
+
 class ListarFrameworksResponse(BaseModel):
     detalles: List[RepositoriosFrameworks]
     resumen: Dict[str, FrameworkSummary]
+    porcentajes: List[LenguajeInfo] 
 
     

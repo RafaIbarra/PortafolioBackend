@@ -268,7 +268,8 @@ def fetch_lenguajes():
         percentages = {}
         if total_bytes > 0:  # Evitar división por cero
             for language, bytes_used in language_totals.items():
-                percentages[language] = f"{(bytes_used / total_bytes * 100):.2f}%"
+                percentages[language] = (bytes_used / total_bytes * 100).__round__(2)
+                
 
         # 6. Imprimir resultados
         print("Distribución de lenguajes:")
