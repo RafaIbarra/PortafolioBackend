@@ -154,5 +154,11 @@ class ListarFrameworksResponse(BaseModel):
     detalles: List[RepositoriosFrameworks]
     resumen: Dict[str, FrameworkSummary]
     porcentajes: List[LenguajeInfo] 
+    actualizacion: Optional[datetime] = None
+    @field_serializer("actualizacion")
+    def serialize_fecha_registro(self, fecha: Optional[datetime]) -> Optional[str]:
+        if fecha:
+            return fecha.strftime("%d/%m/%Y %H:%M:%S")
+        return None
 
     

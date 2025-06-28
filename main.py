@@ -197,13 +197,16 @@ def ListarFrameworks(db: Session = Depends(get_db)
     ]
     
     # Construir respuesta final
+    print('frameworks', frameworks[0].fecha_registro)
+    fecha_actualizacion=frameworks[0].fecha_registro
     return {
         'detalles': frameworks,
         'resumen': {
             k: schemas.FrameworkSummary(**v) 
             for k, v in data_resumen.items()
         },
-        'porcentajes': data_lenguajes
+        'porcentajes': data_lenguajes,
+        'actualizacion':fecha_actualizacion
     }
 
 
