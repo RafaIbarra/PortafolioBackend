@@ -101,10 +101,12 @@ def fetch_auto_detected_frameworks():
                             repo_dependencies[repo['name']]['packages'].extend(packages)
                             repo_dependencies[repo['name']]['has_dependencies'] = len(packages) > 0
                     except Exception as e:
-                        print(f"Error leyendo requirements.txt en {repo['name']}: {e}")
+                        # print(f"Error leyendo requirements.txt en {repo['name']}: {e}")
+                        raise error
 
             except Exception as error:
-                print(f"Error procesando {repo['name']}: {error}")
+                # print(f"Error procesando {repo['name']}: {error}")
+                raise error
 
         # 5. Configuración de detección de frameworks con prioridades
         framework_detectors = {
@@ -227,7 +229,7 @@ def fetch_auto_detected_frameworks():
     
 
     except Exception as error:
-        print("Error general:", error)
+        
         raise error
 
 def fetch_lenguajes():
@@ -258,7 +260,7 @@ def fetch_lenguajes():
                         language_totals[language] += bytes_used
 
             except Exception as e:
-                print(f"Error obteniendo lenguajes para {repo['name']}: {e}")
+                # print(f"Error obteniendo lenguajes para {repo['name']}: {e}")
                 continue
 
         # 4. Calcular total de bytes
@@ -272,12 +274,11 @@ def fetch_lenguajes():
                 
 
         # 6. Imprimir resultados
-        print("Distribución de lenguajes:")
-        for lang, percent in percentages.items():
-            print(f"{lang}: {percent}")
+        
+        
 
         return percentages
 
     except Exception as error:
-        print("Error general:", error)
+        
         return {}

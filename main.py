@@ -84,7 +84,7 @@ def generar_token(longitud: int = 20):
     caracteres = string.ascii_letters + string.digits + string.punctuation
     return ''.join(random.choices(caracteres, k=longitud))
 
-@app.get("/RegistrarEstadisticasRepositorio/", status_code=200)
+@app.post("/RegistrarEstadisticasRepositorio/", status_code=200)
 def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get_db), _: str = Depends(verify_api_session)):
     try:
         # Obtener los frameworks detectados
@@ -149,7 +149,7 @@ def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get
 
     except Exception as error:
         db.rollback()
-        print("Error general:", error)
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(error)
@@ -197,8 +197,9 @@ def ListarFrameworks(db: Session = Depends(get_db)
     ]
     
     # Construir respuesta final
-    print('frameworks', frameworks[0].fecha_registro)
+    
     fecha_actualizacion=frameworks[0].fecha_registro
+    
     return {
         'detalles': frameworks,
         'resumen': {
