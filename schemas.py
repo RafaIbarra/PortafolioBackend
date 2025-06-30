@@ -150,11 +150,16 @@ class LenguajeInfo(BaseModel):
     lenguaje: str
     valor: float
 
+class CantidadesFrameworks(BaseModel):
+    framework : str
+    cantidad : int
+
 class ListarFrameworksResponse(BaseModel):
     detalles: List[RepositoriosFrameworks]
     resumen: Dict[str, FrameworkSummary]
     porcentajes: List[LenguajeInfo] 
     actualizacion: Optional[datetime] = None
+    cantidades: List[CantidadesFrameworks]
     @field_serializer("actualizacion")
     def serialize_fecha_registro(self, fecha: Optional[datetime]) -> Optional[str]:
         if fecha:

@@ -157,7 +157,7 @@ def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get
 
 @app.get("/ListarFrameworks/", response_model=schemas.ListarFrameworksResponse, status_code=status.HTTP_200_OK)
 def ListarFrameworks(db: Session = Depends(get_db)
-                      ,_: str = Depends(verify_api_key)
+                       ,_: str = Depends(verify_api_key)
                      ):
     # Obtener todos los registros de frameworks
     db_frameworks = db.query(models.RepositoriosFrameworks).all()
@@ -195,6 +195,15 @@ def ListarFrameworks(db: Session = Depends(get_db)
             "valor": float(item.Valor)  # Convertir Decimal a float
         } for item in db_lenguajes
     ]
+    data_cantidades=[]
+    
+    for a,v in data_resumen.items():
+        
+        result={
+            'framework':a,
+            'cantidad':v['count']
+        }
+        data_cantidades.append(result)
     
     # Construir respuesta final
     
@@ -207,7 +216,8 @@ def ListarFrameworks(db: Session = Depends(get_db)
             for k, v in data_resumen.items()
         },
         'porcentajes': data_lenguajes,
-        'actualizacion':fecha_actualizacion
+        'actualizacion':fecha_actualizacion,
+        'cantidades':data_cantidades
     }
 
 
