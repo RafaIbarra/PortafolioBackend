@@ -6,6 +6,7 @@ import os
 from collections import defaultdict
 def fetch_auto_detected_frameworks():
     try:
+        
         # 1. Obtener repositorios del usuario
         headers = {
             "Authorization": f"Bearer {os.getenv('VITE_GITHUB_TOKEN')}"
@@ -16,7 +17,7 @@ def fetch_auto_detected_frameworks():
             raise Exception("Error al obtener repositorios")
         
         repos = repos_response.json()
-
+        
         # 2. Objeto para almacenar dependencias por repositorio
         repo_dependencies = {}
 

@@ -33,6 +33,7 @@ app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)  # Crea la carpeta si no existe
 origins = [
     "http://localhost:5173",
+    "http://localhost:5174",
     "http://127.0.0.1:5173",
     "https://portafolio-web-admin-yu42.vercel.app",
     "https://portafolio-web-admin.vercel.app",
@@ -85,7 +86,9 @@ def generar_token(longitud: int = 20):
     return ''.join(random.choices(caracteres, k=longitud))
 
 @app.post("/RegistrarEstadisticasRepositorio/", status_code=200)
-def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get_db), _: str = Depends(verify_api_session)):
+def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get_db), 
+                                    #  _: str = Depends(verify_api_session)
+                                     ):
     try:
         # Obtener los frameworks detectados
         framework_details = fetch_auto_detected_frameworks()
