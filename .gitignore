@@ -5,3 +5,4 @@ script.py.mako
 alembic.ini
 portafolio_app.tar
 .env
+database.db
