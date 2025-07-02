@@ -37,7 +37,8 @@ origins = [
     "http://127.0.0.1:5173",
     "https://portafolio-web-admin-yu42.vercel.app",
     "https://portafolio-web-admin.vercel.app",
-    "https://pradmin.rafaelibarra.xyz"  # ¡Añade este dominio!
+    "https://pradmin.rafaelibarra.xyz",
+    "https://www.rafaelibarra.xyz"
 ]
 
 app.add_middleware(
