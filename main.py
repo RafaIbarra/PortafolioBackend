@@ -11,7 +11,8 @@ from schemas import ListarFrameworksResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from datetime import datetime
-from fastapi import UploadFile, File, Form
+from fastapi import UploadFile, File, Form,Response
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi import Request
 from starlette.datastructures import UploadFile as StarletteUploadFile
@@ -440,6 +441,29 @@ def listar_proyectos(request: Request,id: int, db: Session = Depends(get_db), _:
         if proyecto.Logo:
             proyecto.Logo = f"{base_url}{proyecto.Logo}"
     return proyectos
+
+@app.get("/CurriculumData/{download}")
+async def CurriculumData(download: str = 'NO'):
+    pdf_name='Rafael-Ibarra-CV.pdf'
+    pdf_path = f"uploads/{pdf_name}"
+    
+    if not os.path.exists(pdf_path):
+        return {"error": "PDF not found"}
+    print(download)
+    if download=='SI':
+         return FileResponse(
+            pdf_path,
+            media_type="application/octet-stream",
+            filename=pdf_name
+        )
+     
+    else:
+      
+        return FileResponse(
+                pdf_path,
+                media_type="application/pdf"
+            )
+    
 
 @app.post("/ValidarPass/")
 async def validar_contrasena(password: str = Form(...)):
