@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .contenedor {
+            width: 800px; 
+            height: 500px;
+            margin: 0 auto; 
+            background-color: #f2f2f2;
+            padding: 30px
+        }
+        .contenedor h1 {
+            text-align: center; /* Alinea el texto del h1 al centro */
+            color: darkgreen;
+            margin-bottom: 50px
+        }
+        .miDiv {
+            background-color: #3498db; /* Fondo azul claro */
+            border: 2px solid #2980b9; /* Borde azul más oscuro */
+            border-radius: 10px; /* Bordes redondeados */
+            padding: 20px; /* Espaciado interno */
+            text-align: center; /* Alinea el texto al centro */
+        }
+
+        .miDiv h4 {
+            margin: 0; /* Elimina el margen predeterminado del h3 */
+            color: #fff; /* Color del texto blanco */
+            font-size: 30px
+        }
+    </style>
+    <title>Perfil.</title>
+</head>
+<body>
+    <div class="contenedor">
+        <div>
+            <h1>{{Asunto}} </h1>
+            <h2>{{Mensaje}}</h2>
+            
+        </div>
+        <div>
+            <h2>Correo del solicitante: {{correo}} </h2>
+        </div>
+        
+    
+    </div>
+</body>
+</html>

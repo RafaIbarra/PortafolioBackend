@@ -23,12 +23,15 @@ import string
 from sqlalchemy import delete
 from collections import defaultdict
 from decimal import Decimal
+from utils.email_service import EmailService,verificar_dominio_email
+from pathlib import Path
 # Crear la aplicación FastAPI
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
 PSW= os.getenv('PSW')
 
 app = FastAPI()
+email_service = EmailService()
 UPLOAD_DIR = "uploads/logos"  # Carpeta donde se guardarán los archivos
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)  # Crea la carpeta si no existe
@@ -89,7 +92,7 @@ def generar_token(longitud: int = 20):
 
 @app.post("/RegistrarEstadisticasRepositorio/", status_code=200)
 def RegistrarEstadisticasRepositorio(request: Request, db: Session = Depends(get_db), 
-                                    #  _: str = Depends(verify_api_session)
+                                      _: str = Depends(verify_api_session)
                                      ):
     try:
         # Obtener los frameworks detectados
@@ -443,7 +446,7 @@ def listar_proyectos(request: Request,id: int, db: Session = Depends(get_db), _:
     return proyectos
 
 @app.get("/CurriculumData/{download}")
-async def CurriculumData(download: str = 'NO'):
+async def CurriculumData(download: str = 'NO',_: str = Depends(verify_api_key)):
     pdf_name='Rafael-Ibarra-CV.pdf'
     pdf_path = f"uploads/{pdf_name}"
     
@@ -470,6 +473,51 @@ async def validar_contrasena(password: str = Form(...)):
     if password != PSW:
         raise HTTPException(status_code=400, detail="Contraseña incorrecta")
     return {"mensaje": "Contraseña válida"}
+
+@app.post("/CorreoContacto/")
+async def envio_contacto(nombre: str = Form(...),correocontacto: str = Form(...),mensaje: str = Form(...)
+                         ,_: str = Depends(verify_api_key)
+                         ):
+    # Datos de ejemplo (deberías obtenerlos de tu base de datos)
+    if len(mensaje)>250:
+            raise HTTPException(status_code=404, detail="Mensaje muy largo")
+    
+    if not verificar_dominio_email(correocontacto):
+        raise HTTPException(status_code=400, detail="El dominio del correo no existe")
+    datos_usuario = {
+       
+        'correo': 'blasrafael1986@gmail.com'
+    }
+    
+    # Generar código y fecha de validez
+    
+    
+    
+    # Contexto para el template
+    contexto = {
+        'Nombre': nombre,
+        'correo': correocontacto,
+        'Asunto': 'Contacto desde perfil',
+        'Mensaje':mensaje,
+        
+    }
+    
+    # Ruta al template (ajusta según tu estructura)
+    template_path = Path("templates/archivo.html")
+    
+    # Enviar correo
+    if email_service.enviar_correo_html(
+        destinatario=datos_usuario['correo'],
+        asunto='Contacto desde perfil',
+        template_html=template_path,
+        contexto=contexto
+    ):
+        return {"mensaje": "Correo de recuperación enviado correctamente"}
+    else:
+        raise HTTPException(
+            status_code=500,
+            detail="Error al enviar el correo de recuperación"
+        )
 
 # Endpoint de prueba
 @app.get("/")
