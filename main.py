@@ -446,7 +446,9 @@ def listar_proyectos(request: Request,id: int, db: Session = Depends(get_db), _:
     return proyectos
 
 @app.get("/CurriculumData/{download}")
-async def CurriculumData(download: str = 'NO',_: str = Depends(verify_api_key)):
+async def CurriculumData(download: str = 'NO',
+                        #  _: str = Depends(verify_api_key)
+                         ):
     pdf_name='Rafael-Ibarra-CV.pdf'
     pdf_path = f"uploads/{pdf_name}"
     
