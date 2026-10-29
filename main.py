@@ -519,11 +519,7 @@ async def envio_contacto(nombre: str = Form(...),correocontacto: str = Form(...)
         'correo': 'blasrafael1986@gmail.com'
     }
     
-    # Generar código y fecha de validez
-    
-    
-    
-    # Contexto para el template
+
     contexto = {
         'Nombre': nombre,
         'correo': correocontacto,
