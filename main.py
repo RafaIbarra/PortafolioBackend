@@ -475,27 +475,27 @@ async def SubirCv(
     archivo: UploadFile = File(...),
     _: str = Depends(verify_api_session)
 ):
-    header = await archivo.read(1024)
-    if b"%PDF-" not in header:
-        raise HTTPException(status_code=400, detail="El archivo debe ser un PDF")
+    # header = await archivo.read(1024)
+    # if b"%PDF-" not in header:
+    #     raise HTTPException(status_code=400, detail="El archivo debe ser un PDF")
 
-    await archivo.seek(0)
-    os.makedirs("uploads", exist_ok=True)
-    pdf_path = os.path.join("uploads", "Rafael-Ibarra-CV.pdf")
-    if os.path.exists(pdf_path):
-        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-        previous_pdf_path = os.path.join(
-            "uploads", f"Rafael-Ibarra-CV-{timestamp}.pdf"
-        )
-        os.rename(pdf_path, previous_pdf_path)
+    # await archivo.seek(0)
+    # os.makedirs("uploads", exist_ok=True)
+    # pdf_path = os.path.join("uploads", "Rafael-Ibarra-CV.pdf")
+    # if os.path.exists(pdf_path):
+    #     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    #     previous_pdf_path = os.path.join(
+    #         "uploads", f"Rafael-Ibarra-CV-{timestamp}.pdf"
+    #     )
+    #     os.rename(pdf_path, previous_pdf_path)
 
-    with open(pdf_path, "wb") as pdf_file:
-        while True:
-            chunk = await archivo.read(1024 * 1024)
-            if not chunk:
-                break
-            pdf_file.write(chunk)
-
+    # with open(pdf_path, "wb") as pdf_file:
+    #     while True:
+    #         chunk = await archivo.read(1024 * 1024)
+    #         if not chunk:
+    #             break
+    #         pdf_file.write(chunk)
+    print("aca")
     return {"mensaje": "CV subido correctamente"}
 
 @app.post("/ValidarPass/")
